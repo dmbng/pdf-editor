@@ -1,0 +1,13 @@
+# Runtime dependencies for the hosted web editor.
+# The desktop-only packages (customtkinter, tkinterdnd2, pywin32, pyinstaller)
+# are deliberately absent: the server never imports them.
+pymupdf>=1.23.0
+pypdf>=4.0.0
+pillow>=10.0.0
+reportlab>=4.0.0
+python-docx>=1.0.0
+openpyxl>=3.1.0
+python-pptx>=0.6.21
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.9

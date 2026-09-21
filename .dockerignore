@@ -1,0 +1,11 @@
+build/
+dist/
+demo/
+samples/
+tests/
+.pytest_cache/
+__pycache__/
+*.pyc
+*.spec
+PDF Editor.bat
+build_exe.py

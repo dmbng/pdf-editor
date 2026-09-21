@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>PDF Editor</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+
+<!-- Sign in -->
+<section id="gate" class="gate" hidden>
+  <form id="gate-form" class="gate-card">
+    <h1 id="gate-title">PDF Editor</h1>
+    <p class="muted">Enter the password you were given.</p>
+    <input id="gate-password" type="password" autocomplete="current-password" placeholder="Password" required>
+    <button type="submit" class="primary">Sign in</button>
+    <p id="gate-error" class="error" role="alert"></p>
+  </form>
+</section>
+
+<!-- Editor -->
+<div id="app" class="app" hidden>
+
+  <header class="bar">
+    <button id="menu-toggle" class="icon" title="Pages" aria-label="Pages">☰</button>
+    <strong id="doc-name" class="doc-name">No document</strong>
+
+    <div class="spacer"></div>
+
+    <button id="btn-open" class="chip">Open</button>
+    <button id="btn-undo" class="chip" disabled>Undo</button>
+    <button id="btn-redo" class="chip" disabled>Redo</button>
+    <button id="btn-download" class="chip accent" disabled>Download</button>
+    <button id="btn-signout" class="icon" title="Sign out" aria-label="Sign out">&#9099;</button>
+  </header>
+
+  <nav class="subbar">
+    <button id="page-prev" class="icon" aria-label="Previous page">&lsaquo;</button>
+    <span id="page-label" class="muted">0 / 0</span>
+    <button id="page-next" class="icon" aria-label="Next page">&rsaquo;</button>
+    <span class="divider"></span>
+    <button id="zoom-out" class="icon" aria-label="Zoom out">&minus;</button>
+    <span id="zoom-label" class="muted">100%</span>
+    <button id="zoom-in" class="icon" aria-label="Zoom in">+</button>
+    <span class="divider"></span>
+    <button id="tab-text" class="tab is-active">Text</button>
+    <button id="tab-pages" class="tab">Pages</button>
+    <button id="tab-tools" class="tab">Tools</button>
+  </nav>
+
+  <main class="body">
+
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-head">
+        <span>Pages</span>
+        <button id="select-all" class="link">Select all</button>
+      </div>
+      <div id="thumbs" class="thumbs"></div>
+    </aside>
+
+    <section id="stage" class="stage">
+      <div id="empty" class="empty">
+        <h2>Open a document</h2>
+        <p class="muted">PDF, Word, Excel or PowerPoint.</p>
+        <button id="empty-open" class="primary">Choose a file</button>
+        <p id="empty-hint" class="muted small"></p>
+      </div>
+      <div id="canvas-wrap" class="canvas-wrap" hidden>
+        <div id="canvas" class="canvas">
+          <img id="page-image" alt="Page">
+          <div id="overlay" class="overlay"></div>
+        </div>
+      </div>
+    </section>
+
+    <aside id="panel" class="panel">
+
+      <div id="pane-text" class="pane">
+        <h3>Text</h3>
+        <p class="muted small">Drag across words on the page to select them.</p>
+        <label class="field">
+          <span>Selected</span>
+          <textarea id="selected-text" rows="2" readonly placeholder="Nothing selected"></textarea>
+        </label>
+        <label class="field">
+          <span>Replace with</span>
+          <textarea id="replacement" rows="3" placeholder="New text"></textarea>
+        </label>
+        <label class="check">
+          <input id="reflow" type="checkbox" checked>
+          <span>Reflow the paragraph</span>
+        </label>
+        <div class="stack">
+          <button id="btn-replace" class="primary" disabled>Replace</button>
+          <button id="btn-delete-text" class="danger" disabled>Delete text</button>
+          <button id="btn-highlight" class="warn" disabled>Highlight</button>
+          <button id="btn-redact" class="ghost" disabled>Redact</button>
+        </div>
+        <h3>Find</h3>
+        <div class="row">
+          <input id="find-input" type="search" placeholder="Search the document">
+          <button id="btn-find" class="ghost">Find</button>
+        </div>
+        <p id="find-result" class="muted small"></p>
+      </div>
+
+      <div id="pane-pages" class="pane" hidden>
+        <h3>Selected pages</h3>
+        <p id="pages-selection" class="muted small">Current page only</p>
+        <div class="stack">
+          <button id="btn-duplicate" class="ghost">Duplicate</button>
+          <button id="btn-rotate-left" class="ghost">Rotate left</button>
+          <button id="btn-rotate-right" class="ghost">Rotate right</button>
+          <button id="btn-move-up" class="ghost">Move earlier</button>
+          <button id="btn-move-down" class="ghost">Move later</button>
+          <button id="btn-delete-pages" class="danger">Delete pages</button>
+        </div>
+        <h3>Add a blank page</h3>
+        <div class="row">
+          <select id="blank-size">
+            <option value="match">Same as current</option>
+            <option value="A4">A4</option>
+            <option value="Letter">Letter</option>
+            <option value="Legal">Legal</option>
+            <option value="A3">A3</option>
+            <option value="A5">A5</option>
+          </select>
+          <select id="blank-where">
+            <option value="after">After current</option>
+            <option value="before">Before current</option>
+            <option value="end">At the end</option>
+          </select>
+        </div>
+        <button id="btn-blank" class="ghost wide">Insert blank page</button>
+        <h3>Merge</h3>
+        <button id="btn-merge" class="ghost wide">Merge PDFs into this one</button>
+      </div>
+
+      <div id="pane-tools" class="pane" hidden>
+        <h3>Insert</h3>
+        <button id="btn-image" class="ghost wide">Place an image</button>
+        <p class="muted small">It lands in the middle of the page. Drag it, or pull a corner to resize.</p>
+        <div id="image-actions" class="stack" hidden>
+          <button id="btn-image-delete" class="danger">Delete selected image</button>
+        </div>
+
+        <h3>Compress</h3>
+        <select id="compress-level"></select>
+        <p id="compress-note" class="muted small"></p>
+        <label class="check">
+          <input id="compress-lossless" type="checkbox">
+          <span>Never touch images</span>
+        </label>
+        <button id="btn-compress" class="ghost wide">Compress</button>
+
+        <h3>Export as Word</h3>
+        <select id="word-method"></select>
+        <button id="btn-word" class="ghost wide">Export .docx</button>
+
+        <div id="results" class="results"></div>
+      </div>
+
+    </aside>
+  </main>
+
+  <footer class="status">
+    <span id="status">Ready</span>
+  </footer>
+
+  <div id="selection-bar" class="selection-bar" hidden>
+    <button data-act="replace">Replace</button>
+    <button data-act="delete">Delete</button>
+    <button data-act="highlight">Highlight</button>
+    <button data-act="clear">Clear</button>
+  </div>
+
+  <div id="busy" class="busy" hidden><div class="spinner"></div><span id="busy-text">Working</span></div>
+
+  <input id="file-pdf" type="file" hidden accept=".pdf,.docx,.doc,.docm,.rtf,.odt,.xlsx,.xls,.xlsm,.ods,.csv,.pptx,.ppt,.pptm,.odp">
+  <input id="file-merge" type="file" hidden accept=".pdf" multiple>
+  <input id="file-image" type="file" hidden accept="image/*">
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

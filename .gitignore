@@ -1,0 +1,12 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Build outputs, far too large for a repository
+build/
+dist/
+
+# Local scratch
+*.log

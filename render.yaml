@@ -1,0 +1,32 @@
+# Render blueprint for the hosted PDF editor.
+# Connect this repository at https://dashboard.render.com/blueprints and Render
+# reads this file; the only thing you set by hand is the password.
+services:
+  - type: web
+    name: pdf-editor
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./webapp/Dockerfile
+    dockerContext: .
+    healthCheckPath: /healthz
+    autoDeployTrigger: commit
+    envVars:
+      # Set this in the Render dashboard; it is deliberately not in the repository.
+      - key: APP_PASSWORD
+        sync: false
+      - key: APP_SECRET_KEY
+        generateValue: true
+      # Sized for the free instance, which has 512 MB of memory.
+      - key: MAX_UPLOAD_MB
+        value: "15"
+      - key: MAX_SESSIONS
+        value: "3"
+      - key: MAX_HISTORY_STEPS
+        value: "4"
+      - key: MAX_HISTORY_MB
+        value: "24"
+      - key: SESSION_IDLE_MINUTES
+        value: "30"
+      - key: APP_TITLE
+        value: "PDF Editor"
